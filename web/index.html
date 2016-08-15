@@ -295,21 +295,6 @@
                 return result;
             })
         };
-        function doDelete(id) {
-            if (confirm("确定要删除此压缩文件吗？")) {
-                //$.get("./restful/service/zip/delete/" + id, function (result) {
-                //    if (result > 0) {
-                        
-                //    }
-                //})
-                $("#table").bootstrapTable("remove", {
-                    field: 'id',
-                    values: '12'
-                });
-                
-                
-            }
-        }
         var clickId;
         function showDetails(id) {
             $('#myModal').modal("show");
