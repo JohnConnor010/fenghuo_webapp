@@ -1,4 +1,4 @@
-/*
+﻿/*
  * jQuery Bootstrap Pagination v1.3.1
  * https://github.com/esimakin/twbs-pagination
  *
@@ -106,7 +106,7 @@
             }
 
             if (this.options.prev) {
-                var prev = pages.currentPage > 1 ? pages.currentPage - 1 : this.options.loop ? this.options.totalPages  : 1;
+                var prev = pages.currentPage > 1 ? pages.currentPage - 1 : this.options.loop ? this.options.totalPages : 1;
                 listItems.push(this.buildItem('prev', prev));
             }
 
@@ -122,7 +122,7 @@
             if (this.options.last) {
                 listItems.push(this.buildItem('last', this.options.totalPages));
             }
-
+            listItems.push("<li data-count='totalPages'><a>共" + this.options.totalPages + "页</a></li>");
             return listItems;
         },
 
@@ -186,7 +186,7 @@
                 itPage++;
             }
 
-            return {"currentPage": currentPage, "numeric": pages};
+            return { "currentPage": currentPage, "numeric": pages };
         },
 
         render: function (pages) {
@@ -205,17 +205,17 @@
                         }
                         break;
                     case 'first':
-                            $this.toggleClass(_this.options.disabledClass, pages.currentPage === 1);
+                        $this.toggleClass(_this.options.disabledClass, pages.currentPage === 1);
                         break;
                     case 'last':
-                            $this.toggleClass(_this.options.disabledClass, pages.currentPage === _this.options.totalPages);
+                        $this.toggleClass(_this.options.disabledClass, pages.currentPage === _this.options.totalPages);
                         break;
                     case 'prev':
-                            $this.toggleClass(_this.options.disabledClass, !_this.options.loop && pages.currentPage === 1);
+                        $this.toggleClass(_this.options.disabledClass, !_this.options.loop && pages.currentPage === 1);
                         break;
                     case 'next':
-                            $this.toggleClass(_this.options.disabledClass,
-                                !_this.options.loop && pages.currentPage === _this.options.totalPages);
+                        $this.toggleClass(_this.options.disabledClass,
+                            !_this.options.loop && pages.currentPage === _this.options.totalPages);
                         break;
                     default:
                         break;
@@ -233,6 +233,11 @@
                     $this.on('click', false);
                     return;
                 }
+                if ($this.data("count") === "totalPages") {
+                    $this.on('click', false);
+                    return;
+                }
+                console.log($this);
                 $this.click(function (evt) {
                     // Prevent click event if href is not set.
                     !_this.options.href && evt.preventDefault();
@@ -257,10 +262,10 @@
         var data = $this.data('twbs-pagination');
         var options = typeof option === 'object' && option;
 
-        if (!data) $this.data('twbs-pagination', (data = new TwbsPagination(this, options) ));
-        if (typeof option === 'string') methodReturn = data[ option ].apply(data, args);
+        if (!data) $this.data('twbs-pagination', (data = new TwbsPagination(this, options)));
+        if (typeof option === 'string') methodReturn = data[option].apply(data, args);
 
-        return ( methodReturn === undefined ) ? $this : methodReturn;
+        return (methodReturn === undefined) ? $this : methodReturn;
     };
 
     $.fn.twbsPagination.defaults = {
