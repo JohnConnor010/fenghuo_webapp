@@ -68,17 +68,19 @@ public class FenghuoService
     
     @GET
     @Path("pagination/countBy/{datasourcetype}/{start}/{end}")
-    public int getCount(@PathParam("datasourcetype") String datasourcetype,
+    public Map<String,Object> getCount(@PathParam("datasourcetype") String datasourcetype,
                         @PathParam("start") String start,
                         @PathParam("end") String end)
     {
-        int result = 0;
+        Map<String,Object> result = new HashMap<>();
         SqlSession session = MyBatisUtil.getFactory().openSession();
         try
         {
             FenghuoMapper mapper = session.getMapper(FenghuoMapper.class);
             int count = mapper.countByCondition(datasourcetype,start,end);
-            result = (int)Math.ceil((double)count / 10);
+            int totalPages = (int)Math.ceil((double)count / 10);
+            result.put("count",count);
+            result.put("totalPages",totalPages);
         }
         finally
         {

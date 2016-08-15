@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>烽火应用</title>
+    <title>类聚数据应用</title>
     <link href="Content/bootstrap.css" rel="stylesheet" />
     <script src="Scripts/jquery-3.1.0.js"></script>
     <script src="Scripts/bootstrap.js"></script>
@@ -33,11 +33,11 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a href="./" class="navbar-brand">烽火应用</a>
+                <a class="navbar-brand">类聚数据</a>
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li><a href="./index">首页</a></li>
+                    <li><a>首页</a></li>
                 </ul>
 
             </div>
@@ -305,7 +305,7 @@
         }
         function pagination(type,start,end) {
             $.get("./restful/service/pagination/countBy/" + type + "/" + start + "/" + end, function (result) {
-                if (result > 0) {
+                if (result.totalPages > 0) {
                     if ($("#pagination-demo").data("twbs-pagination")) {
                         $("#pagination-demo").twbsPagination("destroy");
                     }
@@ -314,9 +314,10 @@
                         prev: "上一页",
                         next: "下一页",
                         last: "尾页",
-                        totalPages: result,
+                        totalPages: result.totalPages,
                         visiblePages: 10,
                         startPage: 1,
+                        totalRows: result.count,
                         onPageClick: function (event, page) {
                             $.get("./restful/service/pagination/" + page + "/" + type + "/" + start + "/" + end, function (result) {
                                 if (result != null) {

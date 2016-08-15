@@ -122,7 +122,7 @@
             if (this.options.last) {
                 listItems.push(this.buildItem('last', this.options.totalPages));
             }
-            listItems.push("<li data-count='totalPages'><a>共" + this.options.totalPages + "页</a></li>");
+            listItems.push("<li data-count='totalPages'><a>共" + this.options.totalRows + "条</a></li>");
             return listItems;
         },
 
@@ -288,7 +288,8 @@
         firstClass: 'first',
         pageClass: 'page',
         activeClass: 'active',
-        disabledClass: 'disabled'
+        disabledClass: 'disabled',
+        totalRows:0
     };
 
     $.fn.twbsPagination.Constructor = TwbsPagination;
