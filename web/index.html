@@ -1,0 +1,353 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>烽火应用</title>
+    <link href="Content/bootstrap.css" rel="stylesheet" />
+    <script src="Scripts/jquery-3.1.0.js"></script>
+    <script src="Scripts/bootstrap.js"></script>
+    <link href="Scripts/bootstrap-datepicker-master/dist/css/bootstrap-datepicker3.css" rel="stylesheet" />
+    <script src="Scripts/twbs-pagination/jquery.twbsPagination.js"></script>
+    <script src="Scripts/bootstrap-datepicker-master/dist/js/bootstrap-datepicker.js"></script>
+    <script src="Scripts/bootstrap-datepicker-master/dist/locales/bootstrap-datepicker.zh-CN.min.js"></script>
+    <link href="Scripts/bootstrap_table/bootstrap-table.css" rel="stylesheet" />
+    <script src="Scripts/bootstrap_table/bootstrap-table.js"></script>
+    <script src="Scripts/bootstrap_table/locale/bootstrap-table-zh-CN.js"></script>
+    <style type="text/css">
+        body {
+            padding-top: 50px;
+            padding-bottom: 20px;
+        }
+        .body-content {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a href="./" class="navbar-brand">烽火应用</a>
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li><a href="./index">首页</a></li>
+                </ul>
+
+            </div>
+        </div>
+    </div>
+    <div class="container body-content">
+        <br/>
+        <div class="form-horizontal">
+            <div class="form-group">
+                <div class="col-md-2 control-label">来源：</div>
+                <div class="col-md-10">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <select id="channel" class="form-control input-sm">
+                                <option value="0">所有</option>
+                                <option value="1">新闻</option>
+                                <option value="16">论坛</option>
+                                <option value="256">博客</option>
+                                <option value="65536">视频</option>
+                                <option value="1048576">微博</option>
+                                <option value="268435456">微信</option>
+                            </select>
+                        </div> 
+                        <div class="col-md-10 form-inline"> 
+                            <label class="control-label">起止时间：</label>
+                            <input type="text" id="txtStartDate" class="form-control input-sm" />
+                            -
+                            <input type="text" id="txtEndDate" class="form-control input-sm" />                          
+                            <input type="number" id="txtOffset" class="form-control input-sm" style="width:80px" placeholder="起始行" value="0" /> -
+                            <input type="number" id="txtLimit" class="form-control input-sm" style="width:80px" placeholder="结束行" value="100" />
+                            <button class="btn btn-sm" id="btnCreateZip" type="button">生成txt</button>
+                            <img src="images/ajax-loader.gif" id="pic_loading" style="display:none" />
+                            <a href="javascript:;" id="download_file" style="display:none">下载</a>
+                            <button type="button" id="btnManageDownload" class="btn btn-sm">管理下载</button>
+                        </div>                       
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-2 control-label">列表：</div>
+                <div class="col-md-10">
+                    <table class="table table-bordered table-condensed">
+                        <thead>
+                            <tr>
+                                <th style="width:40px">编号</th>
+                                <th>版块名称</th>
+                                <th>站点名称</th>
+                                <th>标题</th>
+                                <th>数据来源</th>
+                                <th class="text-center">文章内容</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody">
+                            
+                        </tbody>
+                    </table>
+                    <div class="row">
+                        <div class="text-center">
+                            <ul id="pagination-demo" class="pagination-sm"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="myModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" style="display: none;">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">文章内容</h4>
+                </div>
+                <div class="modal-body" id="modal-body" style="width:auto;height:400px;overflow-y:auto">
+                    
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="myModal1" class="modal fade" tabindex="2" role="dialog" aria-labelledby="myModalLabel" style="display:none">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel1">压缩文件列表</h4>
+                </div>
+                <div class="modal-body" id="modal-table">
+                    <div id="toolbar">
+                        <button id="btnDelete" class="btn btn-default">删除</button>
+                    </div>
+                    <table id="table" class="table table-condensed table-striped"
+                           data-toggle="table"
+                           data-height="350"
+                           data-striped="true"
+                           data-url="./restful/service/zip/getall"
+                           data-toolbar="#toolbar">
+                        <thead>
+                            <tr>
+                                <th data-field="state" data-checkbox="true"></th>
+                                <th data-field="id" data-align="center" data-width="40px">编号</th>
+                                <th data-field="title">标题</th>
+                                <th data-field="fileName">文件名</th>
+                                <th data-field="action" data-align="center" data-width="80px">操作</th>
+                            </tr>
+                        </thead>
+                    </table>
+                    
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="Scripts/jsrender.js"></script>
+    <script type="text/x-jsrender" id="template1">
+        {{for items}}
+        <tr>
+            <td style="width:40px">{{:id}}</td>
+            <td><a href="{{:taskurl}}" target="_blank">{{:forumname}}</a></td>
+            <td>{{:sitename}}</td>
+            <td><a href="javascript:;" title="{{:title}}">{{:~subHelper(title,30)}}</a></td>
+            <td>{{:datasourcetype}}</td>
+            <td class="text-center">
+                <a href="javascript:;" onclick="showDetails({{:id}})">详细</a>
+            </td>
+        </tr>
+        {{/for}}
+    </script>
+    <script type="text/x-jsrender" id="template2">
+        {{:for items}}
+        <p>{{:postdata}}</p>
+        <hr />
+        {{:/for}}
+    </script>
+    <script type="text/javascript">
+        function subTitle(title,length) {
+            return title.substring(0, length);
+        }
+        var helpers = {
+            subHelper:subTitle,
+        }
+        $.views.helpers(helpers);
+        $(function () {
+            pagination("0",0,0);
+            $("#channel").change(function () {
+                var val = $(this).val();
+                var start = 0;
+                if ($("#txtStartDate").val() != "") {
+                    start = Date.parse($("#txtStartDate").val()) / 1000;
+                }
+                var end = 0;
+                if ($("#txtEndDate").val() != "") {
+                    end = Date.parse($("#txtEndDate").val()) / 1000;
+                }
+                pagination(val,start,end);
+            });
+            $("#btnCreateZip").click(function () {
+                $(this).prop("disabled", true);
+                $("#pic_loading").show();
+                $("#download_file").hide();
+                var data = {
+                    offset:$("#txtOffset").val(),
+                    limit:$("#txtLimit").val(),
+                    type: $("#channel").val(),
+                    start: $("#txtStartDate").val(),
+                    end:$("#txtEndDate").val()
+
+                };
+                $.ajax({
+                    type: "post",
+                    url: "./restful/service/create/zip",
+                    contentType: "application/json;charset=utf-8",
+                    dataType: "text",
+                    data: JSON.stringify(data),
+                    success: function (result) {
+                        if (result != "") {
+                            $("#btnCreateZip").prop("disabled", false);
+                            $("#pic_loading").hide();
+                            $("#download_file").prop("href", result);
+                            $("#download_file").show();
+
+                        }
+                        console.log("success:" + result);
+                    }
+                });
+            })
+            $("#myModal").on("shown.bs.modal", function (e) {
+                $.get("./restful/service/article/get/" + clickId, function (result) {
+                    if (result != null) {
+                        $("#modal-body").empty();
+                        var html = "";
+                        $.each(result, function (index, item) {
+                            html = html + "<p>" + item.postdata + "</p><br/>";
+                        });
+                        $("#modal-body").html(html);
+
+                    }
+                })
+            });
+            $('#myModal').on('hidden.bs.modal', function (e) {
+                $("#modal-body").empty();
+            });
+            $('#txtStartDate').datepicker({
+                clearBtn: true,
+                format: 'yyyy-mm-dd',
+                language: "zh-CN",
+                autoclose: true,
+                todayHighlight: true
+            });
+            $('#txtEndDate').datepicker({
+                clearBtn: true,
+                format: 'yyyy-mm-dd',
+                language: "zh-CN",
+                autoclose: true,
+                todayHighlight: true
+            });
+            $("#btnManageDownload").click(function () {
+                $("#table").bootstrapTable('refresh');
+                $("#myModal1").modal("show");
+            });
+            $("#myModal1").on("shown.bs.modal", function () {
+                $("#table").bootstrapTable("resetView");
+            })
+            $("#btnDelete").click(function () {
+                var ids = $.map($('#table').bootstrapTable('getSelections'), function (row) {
+                    return row.id;
+                });
+                if (ids.length == 0) {
+                    alert("请这至少选择一项删除");
+                    return false;
+                }
+                if (confirm("确定要删除所选择的选项吗？")) {                    
+                    $.post("./restful/service/zip/delete/", ids.toString(), function (result) {
+                        if (result > 0) {
+                            $('#table').bootstrapTable('remove', {
+                                field: 'id',
+                                values: ids
+                            });
+                        }
+                    })
+                }               
+                
+            })
+            
+        });
+        function loadData() {
+            $.get("./restful/service/zip/getall", function (result) {
+                return result;
+            })
+        };
+        function doDelete(id) {
+            if (confirm("确定要删除此压缩文件吗？")) {
+                //$.get("./restful/service/zip/delete/" + id, function (result) {
+                //    if (result > 0) {
+                        
+                //    }
+                //})
+                $("#table").bootstrapTable("remove", {
+                    field: 'id',
+                    values: '12'
+                });
+                
+                
+            }
+        }
+        var clickId;
+        function showDetails(id) {
+            $('#myModal').modal("show");
+            clickId = id;
+        }
+        function pagination(type,start,end) {
+            $.get("./restful/service/pagination/countBy/" + type + "/" + start + "/" + end, function (result) {
+                if (result > 0) {
+                    if ($("#pagination-demo").data("twbs-pagination")) {
+                        $("#pagination-demo").twbsPagination("destroy");
+                    }
+                    $("#pagination-demo").twbsPagination({
+                        first: "首页",
+                        prev: "上一页",
+                        next: "下一页",
+                        last: "尾页",
+                        totalPages: result,
+                        visiblePages: 10,
+                        startPage: 1,
+                        onPageClick: function (event, page) {
+                            $.get("./restful/service/pagination/" + page + "/" + type + "/" + start + "/" + end, function (result) {
+                                if (result != null) {
+                                    $("#tbody").empty();
+                                    var data = { items: result };
+                                    var html = $("#template1").render(data);
+                                    $("#tbody").html(html);
+                                }
+                            })
+                        }
+
+                    })
+                } else {
+                    $("#tbody").empty();
+                    $("#pagination-demo").twbsPagination("destroy");
+                }
+            });
+            
+        }
+    </script>
+</body>
+</html>
